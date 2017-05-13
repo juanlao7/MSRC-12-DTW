@@ -17,14 +17,14 @@ function [model, samples] = train(gesture)
                 if Y(i, gesture) == 1
                     if last ~= 1            % We discard the first gesture of the file
                         sequence = X(last:i, :);
-                        % TODO: normalize
                         
                         if isnan(modelSequence)
                             modelSequence = sequence;   % We choose the first sequence as model
                         else
+                            errorMap = dtw(modelSequence, sequence, 'match');
                             nSamples = nSamples + 1;
                             samples{nSamples, 1} = sequence;
-                            samples{nSamples, 2} = dtw(modelSequence, sequence, 'match');
+                            samples{nSamples, 2} = errorMap(end, end);
                         end
                     end
                     
@@ -40,6 +40,6 @@ function [model, samples] = train(gesture)
     threshold = samples{end, 2};
     
     % Generating the model.
-    model = struct('sequence', modelSequence, 'threshold', threshold);
+    model = struct('sequence', modelSequence, 'threshold', threshold, 'gesture', gesture);
 end
 

@@ -1,4 +1,6 @@
+% Demo 2: train and test a model for gesture detection.
 % Just execute this script. It is interactive, no previous configuration is needed.
+
 clear;
 
 disp('Gestures:');
@@ -27,7 +29,7 @@ toc
 disp(' ');
 
 if strcmpi(input('Do you want to visualize the model sequence? (Y/N) [N]: ', 's'), 'y') == 1
-    animate(model.sequence, false);
+    animate(model.sequence);
 end
 
 disp(' ');
@@ -43,7 +45,7 @@ while true
     end
     
     disp(['This sample got an error of ' num2str(samples{sampleIndex, 2})]);
-    animate(samples{sampleIndex, 1}, false);
+    animate(samples{sampleIndex, 1});
     disp('Visualization finished.');
     disp(' ');
 end
@@ -59,12 +61,15 @@ while true
     end
     
     [X, Y, ~] = load_file(file);
-    
+    [realGestures, detectedGestures, errorMap, errorMapWithBacktracking] = test(model, X, Y);
+    disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
+    disp(['Our model detects ' num2str(detectedGestures) ' gestures of type ' num2str(gesture) ' in file ' file]);
+    image(errorMapWithBacktracking);
+    colorbar;
+        
     if strcmpi(input('Do you want to continue testing another file? (Y/N) [N]: ', 's'), 'y') ~= 1
         break;
     end
     
     disp(' ');
 end
-
-%result = test(model, X, Y);
