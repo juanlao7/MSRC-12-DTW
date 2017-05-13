@@ -61,12 +61,11 @@ while true
     end
     
     [X, Y, ~] = load_file(file);
-    [realGestures, detectedGestures, errorMap, errorMapWithBacktracking] = test(model, X, Y);
+    [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturesSequence] = test(model, X, Y, true, 'all');
     disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
     disp(['Our model detects ' num2str(detectedGestures) ' gestures of type ' num2str(gesture) ' in file ' file]);
-    image(errorMapWithBacktracking);
-    colorbar;
-        
+    plotTestResult(errorMap, backtrackingMap, realGesturesSequence);
+    
     if strcmpi(input('Do you want to continue testing another file? (Y/N) [N]: ', 's'), 'y') ~= 1
         break;
     end

@@ -18,6 +18,9 @@ function E = dtw(modelSequence, testSequence, mode)
         for j = 2:cols
             cost = difference(modelSequence(i - 1, :), testSequence(j - 1, :));
             E(i, j) = cost + min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1)]);
+            %E(i, j) = E(i - 1, j - 1) + cost;
+            %E(i, j) = min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1) + cost]);
+            %E(i, j) = min([E(i - 1, j) + 99999, E(i, j - 1) + 99999, E(i - 1, j - 1) + cost]);
         end
     end
 end

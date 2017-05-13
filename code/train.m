@@ -25,6 +25,13 @@ function [model, samples] = train(gesture)
                             nSamples = nSamples + 1;
                             samples{nSamples, 1} = sequence;
                             samples{nSamples, 2} = errorMap(end, end);
+                            
+                            if false
+                                model = struct('sequence', modelSequence, 'threshold', errorMap(end, end), 'gesture', gesture);
+                                [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturesSequence] = test(model, sequence, Y(last:i,:), true, 'all');
+                                plotTestResult(errorMap, backtrackingMap, realGesturesSequence);
+                                pause();
+                            end
                         end
                     end
                     
