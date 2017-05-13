@@ -17,11 +17,9 @@ function E = dtw(modelSequence, testSequence, mode)
     for i = 2:rows
         for j = 2:cols
             cost = compareFrames(modelSequence(i - 1, :), testSequence(j - 1, :));
-            E(i, j) = cost + min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1)]);     % With potential. Generates too many positives before arriving to the target.
+            E(i, j) = cost + min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1)]);     % With potential. Generates too many positives before arrivi
             %E(i, j) = E(i - 1, j - 1) + cost;       % Pretty good. Almost always generates just 1 positive per gesture. The only problem is that the detected ending of the gesture is a bit displaced to the right respecting the real.
             %E(i, j) = min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1) + cost]);      % It does not work. Everything is a positive.
-            %E(i, j) = min([E(i - 1, j) + cost * 2, E(i, j - 1) + cost * 2, E(i - 1, j - 1) + cost]);        % Pretty good too. An intermediate between 1 and 2
-            %E(i, j) = cost + min([E(i, j - 1), E(i - 1, j - 1)]);       % Nice try, but we have the same problem as 2
         end
     end
 end

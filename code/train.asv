@@ -56,7 +56,7 @@ function [model, samples] = train(gesture)
         candidate = 1;
         
         while candidate < n
-            if errorMap(n - candidate, end - 1) <= errorMap(n - candidate, end)
+            if errorMap(n - candidate + 
                 break;
             end
             
@@ -64,11 +64,11 @@ function [model, samples] = train(gesture)
         end
         
         if candidate > lastInsertionThreshold
-            lastInsertionThreshold = candidate;
+            lastInsertionThreshold = candidate
         end
     end
     
     % Generating the model.
-    model = struct('sequence', modelSequence, 'errorThreshold', errorThreshold, 'lastInsertionThreshold', lastInsertionThreshold, 'gesture', gesture);
+    model = struct('sequence', modelSequence, 'errorThreshold', errorThreshold, 'lastInsertionThreshold', 'gesture', gesture);
 end
 

@@ -24,7 +24,7 @@ disp('Training...');
 [model, samples] = train(gesture);
 disp('Training finished!');
 disp([num2str(length(samples)) ' samples found (model sequence not included).']);
-disp(['Optimal DTW threshold to avoid false negatives: ' num2str(model.threshold)]);
+disp(['Optimal DTW threshold to avoid false negatives: ' num2str(model.errorThreshold)]);
 toc
 disp(' ');
 
