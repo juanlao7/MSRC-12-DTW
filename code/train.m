@@ -48,23 +48,24 @@ function [model, samples] = train(gesture)
     
     % Calculating thresholds.
     errorThreshold = samples{end, 2};
+    
     lastInsertionThreshold = 0;
     n = size(modelSequence, 1);
     
     for i = 1:size(samples, 1)
         errorMap = samples{i, 3};
-        candidate = 1;
+        currentLastInsertion = 1;
         
-        while candidate < n
-            if errorMap(n - candidate, end - 1) <= errorMap(n - candidate, end)
+        while currentLastInsertion < n
+            if errorMap(n - currentLastInsertion, end - 1) <= errorMap(n - currentLastInsertion, end)
                 break;
             end
             
-            candidate = candidate + 1;
+            currentLastInsertion = currentLastInsertion + 1;
         end
         
-        if candidate > lastInsertionThreshold
-            lastInsertionThreshold = candidate;
+        if currentLastInsertion > lastInsertionThreshold
+            lastInsertionThreshold = currentLastInsertion;
         end
     end
     

@@ -39,6 +39,8 @@ function [model, samples] = train(gesture)
                     last = i;
                 end
             end
+            
+            break;
         end
     end
     
@@ -48,27 +50,40 @@ function [model, samples] = train(gesture)
     
     % Calculating thresholds.
     errorThreshold = samples{end, 2};
+    
     lastInsertionThreshold = 0;
     n = size(modelSequence, 1);
     
     for i = 1:size(samples, 1)
         errorMap = samples{i, 3};
-        candidate = 1;
+        [~, valleyIndices] = find_peaks(errorMap(end, :) * -1);
+        j = size(valleyIndices, 2);
         
-        while candidate < n
-            if errorMap(n - candidate + 
+        while j >= 1
+            if errorMap(end, valleyIndices(j)) <= errorThreshold
                 break;
             end
             
-            candidate = candidate + 1;
+            lastValleyIndex = valleyIndices(j);
+            j = j - 1;
         end
         
-        if candidate > lastInsertionThreshold
-            lastInsertionThreshold = candidate
+        currentLastInsertion = 1;
+        
+        while currentLastInsertion < n
+            if errorMap(n - currentLastInsertion, lastValleyIndex - 1) <= errorMap(n - currentLastInsertion, lastValleyIndex)
+                break;
+            end
+            
+            currentLastInsertion = currentLastInsertion + 1;
+        end
+        
+        if currentLastInsertion > lastInsertionThreshold
+            lastInsertionThreshold = currentLastInsertion;
         end
     end
     
     % Generating the model.
-    model = struct('sequence', modelSequence, 'errorThreshold', errorThreshold, 'lastInsertionThreshold', 'gesture', gesture);
+    model = struct('sequence', modelSequence, 'errorThreshold', errorThreshold, 'lastInsertionThreshold', lastInsertionThreshold, 'gesture', gesture);
 end
 

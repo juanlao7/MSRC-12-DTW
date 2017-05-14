@@ -22,6 +22,7 @@ function E = dtw(modelSequence, testSequence, mode)
             %E(i, j) = min([E(i - 1, j), E(i, j - 1), E(i - 1, j - 1) + cost]);      % It does not work. Everything is a positive.
             %E(i, j) = min([E(i - 1, j) + cost * 2, E(i, j - 1) + cost * 2, E(i - 1, j - 1) + cost]);        % Pretty good too. An intermediate between 1 and 2
             %E(i, j) = cost + min([E(i, j - 1), E(i - 1, j - 1)]);       % Nice try, but we have the same problem as 2
+            %E(i, j) = min([E(i - 1, j) + cost * 3, E(i, j - 1) + cost, E(i - 1, j - 1) + cost]);      % It does not work. Everything is a positive.
         end
     end
 end
