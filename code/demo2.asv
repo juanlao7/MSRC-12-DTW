@@ -23,31 +23,23 @@ while true
     if isempty(gesture)
         gesture = 1;
     end
-    
-    disp('Reading the dataset...');
-    samples = getSamples(gesture);
-    disp([num2str(size(samples, 1)) ' samples of gesture of type ' num2str(gesture) ' found']);
-    modelIndex = input(['What sample do you want to use as model? (1-' num2str(size(samples, 1)) ') [1]: ']);
-    
-    if isempty(modelIndex)
-        modelIndex = 1;
-    end
 
     tic
     disp('Training...');
-    [model, samples] = train(gesture, samples, modelIndex);
+    [model, samples] = train(gesture);
     disp('Training finished!');
-    disp(['Optimal maximum DTW error threshold: ' num2str(model.maxErrorThreshold)]);
-    disp(['Optimal maximum last insertion threshold: ' num2str(model.lastInsertionThreshold)]);
-    disp(['Optimal maximum number of insertions threshold: ' num2str(model.maxInsertions)]);
+    disp([num2str(length(samples)) ' samples found (model sequence not included).']);
+    disp(['Optimal DTW threshold: ' num2str(model.maxErrorThreshold)]);
+    disp(['Optimal last insertion threshold: ' num2str(model.lastInsertionThreshold)]);
+    disp(['Maximum number of insertions: ' num2str(model.maxInsertions)]);
     toc
 
     while true
         disp('Actions:');
         disp('     1) Visualize the model sequence');
-        disp('     2) Visualize a sample of the training set of the gesture');
+        disp('     2) Visualize a sample of the gesture');
         disp('     3) Test the model against a file');
-        disp('     4) Go back and train another gesture');
+        disp('     4) Train another gesture');
         disp(' ');
         action = input('What do you want to do? (1-4) [3]: ');
         disp(' ');
@@ -65,7 +57,7 @@ while true
             disp('The samples are sorted in ascending order by the error obtained');
             disp('after comparing them against the choosen model sequence with DTW.');
             disp(' ');
-            sampleIndex = input(['Type the number of the sample you want to visualize (1-' num2str(size(samples, 1)) ') [1]: ']);
+            sampleIndex = input(['Type the number of the sample you want to visualize (1-' num2str(length(samples)) ') [1]: ']);
             
             if isempty(sampleIndex)
                 sampleIndex = 1;
@@ -88,35 +80,16 @@ while true
             disp(' ');
             disp('When we perform DTW, we detect several positives that come from the same root,');
             disp('but we have to choose only one as the correct positive.');
-            disp('You can execute the algorithm in different modes:');
-            disp('     - "online": the algorithm detects the first positive it finds,');
-            disp('                 and discards the rest of the branches.');
-            disp('     - "offline": the algorithm detects all the branches and returns');
-            disp('                  the one it considers the best.');
-            disp('     - "all": only for analysis purposes, returns all the branches.');
-            disp(' ');
-            mode = input('What mode do you want to use? (online|offline|all) [offline]: ', 's');
-            
-            if isempty(mode)
-                mode = 'offline';
-            end
-            
-            if strcmp(mode, 'online')
-                mode = 'first';
-            elseif strcmp(mode, 'offline')
-                mode = 'last';
-            else
-                mode = 'all';
-            end
+            disp('You can execute the algorith
 
             [X, Y, ~] = load_file(file);
             
             % Deleting the beginning and the end of the file, since it is not well labeled.
-            cutsY = find(sum(Y, 2));
+            cutsY = find(Y(:, gesture));
             X = X(cutsY(1):cutsY(end), :);
             Y = Y(cutsY(1):cutsY(end), :);
             
-            [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, mode);
+            [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, 'last');
             disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
             disp(['Our model detects ' num2str(detectedGestures) ' gestures of type ' num2str(gesture) ' in file ' file]);
             disp(' ');
@@ -140,7 +113,14 @@ while true
                     end
                     
                     points = find(realGesturePositions);
-                    animate(X(points(index):points(index + 1), :));
+                    
+                    if index == 1
+                        startPoint = 1;
+                    else
+                        startPoint = points(index - 1);
+                    end
+                    
+                    animate(X(startPoint:points(index), :));
                     continue;
                 end
                 

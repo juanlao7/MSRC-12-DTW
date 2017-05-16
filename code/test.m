@@ -1,13 +1,17 @@
 function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, onlyValleys, ramifications)
     realGesturePositions = Y(:, model.gesture)';
-    realGestures = sum(realGesturePositions);
+    realGestures = sum(realGesturePositions) - 1;
 
-    errorMap = dtw(model.sequence, X, 'find');
+    errorMap = dtw(model.sequence, X, 'find', model.weights);
     
     if onlyValleys
         [~, candidates] = find_peaks(errorMap(end, :) * -1);
     else
         candidates = 2:size(errorMap, 2);
+    end
+    
+    if strcmp(ramifications, 'last') == 1
+        candidates = fliplr(candidates);
     end
     
     backtrackingMap = zeros(size(errorMap));
@@ -25,7 +29,7 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
         insertions = 0;
         buffer(i, j) = 1;
         
-        while i > 1 && j > 1
+        while i > 1
             chosenI = i;
             chosenJ = j - 1;
             
@@ -39,7 +43,7 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
                 chosenJ = j - 1;
             end
             
-            if chosenJ == candidate && n - i >= model.lastInsertionThreshold
+            if chosenJ == candidate && n - i >= model.lastInsertionThreshold    % COMPROBAR ESTA CONDICION
                 break;
             end
             
@@ -54,7 +58,7 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
             i = chosenI;
             j = chosenJ;
             
-            if strcmp(ramifications, 'first') == 1 && backtrackingMap(chosenI, chosenJ) == 1
+            if strcmp(ramifications, 'all') == 0 && backtrackingMap(chosenI, chosenJ) == 1
                 break;
             end
             

@@ -1,3 +1,4 @@
 function d = sqeuclidean(a, b)
-    d = sum((a - b) .^ 2);
+    c = a - b;
+    d = sum(c .^ 2);
 end

@@ -4,7 +4,7 @@ function animate(X, normalizeSequence, save)
     end
     
     if nargin < 3
-        save = false;
+        save = true;
     end
     
     if normalizeSequence
