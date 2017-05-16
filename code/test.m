@@ -14,7 +14,7 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
     n = size(errorMap, 1);
     
     for candidate = candidates
-        if errorMap(end, candidate) > model.errorThreshold
+        if errorMap(end, candidate) > model.maxErrorThreshold
             continue;
         end
         
@@ -22,6 +22,7 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
         
         i = n;
         j = candidate;
+        insertions = 0;
         buffer(i, j) = 1;
         
         while i > 1 && j > 1
@@ -38,12 +39,20 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
                 chosenJ = j - 1;
             end
             
-            i = chosenI;
-            j = chosenJ;
-            
-            if j == candidate && n - i >= model.lastInsertionThreshold
+            if chosenJ == candidate && n - i >= model.lastInsertionThreshold
                 break;
             end
+            
+            if chosenJ == j
+                insertions = insertions + 1;
+                
+                if insertions > model.maxInsertions
+                    break;
+                end
+            end
+            
+            i = chosenI;
+            j = chosenJ;
             
             if strcmp(ramifications, 'first') == 1 && backtrackingMap(chosenI, chosenJ) == 1
                 break;

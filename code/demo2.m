@@ -29,8 +29,9 @@ while true
     [model, samples] = train(gesture);
     disp('Training finished!');
     disp([num2str(length(samples)) ' samples found (model sequence not included).']);
-    disp(['Optimal DTW threshold to avoid false negatives: ' num2str(model.errorThreshold)]);
+    disp(['Optimal DTW threshold: ' num2str(model.maxErrorThreshold)]);
     disp(['Optimal last insertion threshold: ' num2str(model.lastInsertionThreshold)]);
+    disp(['Maximum number of insertions: ' num2str(model.maxInsertions)]);
     toc
 
     while true
@@ -77,7 +78,7 @@ while true
             end
 
             [X, Y, ~] = load_file(file);
-            [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, 'first');
+            [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, 'all');
             disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
             disp(['Our model detects ' num2str(detectedGestures) ' gestures of type ' num2str(gesture) ' in file ' file]);
             disp(' ');
@@ -87,9 +88,10 @@ while true
                 disp('Actions:');
                 disp('     1) Visualize a real sample of the file');
                 disp('     2) Visualize a detection');
-                disp('     3) Go back');
+                disp('     3) Visualize the entire file');
+                disp('     4) Go back');
                 disp(' ');
-                action = input('What do you want to do? (1-3) [3]: ');
+                action = input('What do you want to do? (1-4) [4]: ');
                 disp(' ');
                 
                 if action == 1
@@ -99,21 +101,16 @@ while true
                         index = 1;
                     end
                     
-                    points = find(realGesturePositions);            
+                    points = find(realGesturePositions);
                     
-                    if index == 0
+                    if index == 1
                         startPoint = 1;
                     else
-                        startPoint = points(index);
+                        startPoint = points(index - 1);
                     end
                     
-                    if index == realGestures
-                        endPoint = size(X, 2);
-                    else
-                        endPoint = points(index + 1);
-                    end
-                    
-                    animate(X(startPoint:endPoint, :));
+                    animate(X(startPoint:points(index), :));
+                    continue;
                 end
                 
                 if action == 2
@@ -130,12 +127,18 @@ while true
                     endPoint = backtrackingEndingPoints(index);
                     
                     animate(X(startPoint:endPoint, :));
+                    continue;
                 end
                 
                 if action == 3
-                    break;
+                    animate(X);
+                    continue;
                 end
+                
+                break;
             end
+            
+            continue;
         end
 
         if action == 4

@@ -1,3 +1,3 @@
 function d = compareFrames(a, b)
-    d = sqrt(sqeuclidean(normalizeFrame(a), normalizeFrame(b)));
+    d = sqeuclidean(normalizeFrame(a), normalizeFrame(b));
 end

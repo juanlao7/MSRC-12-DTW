@@ -2,6 +2,9 @@ function normalizedFrame = normalizeFrame(frame)
     % Centering on the hip center
     normalizedFrame = frame - repmat(frame(1:4), 1, 20);
     
+    % Deleting the V value.
+    normalizedFrame(4:4:80) = 0;
+    
     % Scaling the skeleton forcing the distance between joint 1 and 2 to be
     % a constant number (0.005, to be able to animate it in a small
     % window).

@@ -24,14 +24,33 @@ function [model, samples] = train(gesture)
                             errorMap = dtw(modelSequence, sequence, 'match');
                             nSamples = nSamples + 1;
                             samples{nSamples, 1} = sequence;
+                            %samples{nSamples, 2} = min(errorMap(end, round(19/20 * end):end));
                             samples{nSamples, 2} = errorMap(end, end);
                             samples{nSamples, 3} = errorMap;
+                            samples{nSamples, 4} = 0;           % Insertions
                             
-                            if false
-                                model = struct('sequence', modelSequence, 'errorThreshold', errorMap(end, end), 'gesture', gesture);
-                                [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturesSequence] = test(model, sequence, Y(last:i,:), true, 'all');
-                                plotTestResult(errorMap, backtrackingMap, realGesturesSequence);
-                                pause();
+                            [r, c] = size(errorMap);
+                            
+                            while r > 1 && c > 1
+                                chosenR = r;
+                                chosenC = c - 1;
+
+                                if errorMap(r - 1, c) <= errorMap(chosenR, chosenC)
+                                    chosenR = r - 1;
+                                    chosenC = c;
+                                end
+
+                                if errorMap(r - 1, c - 1) <= errorMap(chosenR, chosenC)
+                                    chosenR = r - 1;
+                                    chosenC = c - 1;
+                                end
+                                
+                                if chosenC == c
+                                    samples{nSamples, 4} = samples{nSamples, 4} + 1;
+                                end
+
+                                r = chosenR;
+                                c = chosenC;
                             end
                         end
                     end
@@ -47,7 +66,10 @@ function [model, samples] = train(gesture)
     samples = samples(idx, :);
     
     % Calculating thresholds.
-    errorThreshold = samples{end, 2};
+    %maxErrorThreshold = samples{end, 2};
+    maxErrorThreshold = mean([samples{:,2}]) + 3 * std([samples{:,2}]);
+    %maxInsertions = max([samples{:, 4}]);
+    maxInsertions = mean([samples{:, 4}]) + 3 * std([samples{:, 4}]);
     
     lastInsertionThreshold = 0;
     n = size(modelSequence, 1);
@@ -70,6 +92,6 @@ function [model, samples] = train(gesture)
     end
     
     % Generating the model.
-    model = struct('sequence', modelSequence, 'errorThreshold', errorThreshold, 'lastInsertionThreshold', lastInsertionThreshold, 'gesture', gesture);
+    model = struct('sequence', modelSequence, 'maxErrorThreshold', maxErrorThreshold, 'maxInsertions', maxInsertions, 'lastInsertionThreshold', lastInsertionThreshold, 'gesture', gesture);
 end
 
