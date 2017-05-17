@@ -1,6 +1,6 @@
 function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, onlyValleys, ramifications)
     realGesturePositions = Y(:, model.gesture)';
-    realGestures = sum(realGesturePositions) - 1;
+    realGestures = max(0, sum(realGesturePositions) - 1);
 
     errorMap = dtw(model.sequence, X, 'find', model.weights);
     

@@ -1,5 +1,5 @@
-% Demo 2: train and test a model for gesture detection.
-% Just execute this script. It is interactive, no previous configuration is needed.
+% Demo 2: user-interactive demo of the project. The user can train and test models.
+% Just execute this script. No previous configuration is needed.
 
 clear;
 
@@ -25,7 +25,8 @@ while true
     end
     
     disp('Reading the dataset...');
-    samples = getSamples(gesture);
+    [trainingFiles, ~] = getFiles(1, 0);            % In this demo we do not perform a testing analysis.
+    samples = getSamples(trainingFiles, gesture);
     disp([num2str(size(samples, 1)) ' samples of gesture of type ' num2str(gesture) ' found']);
     modelIndex = input(['What sample do you want to use as model? (1-' num2str(size(samples, 1)) ') [1]: ']);
     
@@ -111,10 +112,12 @@ while true
 
             [X, Y, ~] = load_file(file);
             
-            % Deleting the beginning and the end of the file, since it is not well labeled.
-            cutsY = find(sum(Y, 2));
-            X = X(cutsY(1):cutsY(end), :);
-            Y = Y(cutsY(1):cutsY(end), :);
+            if isempty(X)
+                disp('This file is empty!');
+                continue;
+            end
+            
+            [X, Y] = sanitizeFile(X, Y);
             
             [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, mode);
             disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
