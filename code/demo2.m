@@ -120,8 +120,17 @@ while true
             [X, Y] = sanitizeFile(X, Y);
             
             [realGestures, detectedGestures, errorMap, backtrackingMap, realGesturePositions] = test(model, X, Y, true, mode);
+            [beginningDeviations, endingDeviations] = getDeviations(backtrackingMap, realGesturePositions);
+            
             disp(['File ' file ' contains ' num2str(realGestures) ' gestures of type ' num2str(gesture)]);
             disp(['Our model detects ' num2str(detectedGestures) ' gestures of type ' num2str(gesture) ' in file ' file]);
+            disp('True positive detections have:');
+            disp('     For the gesture beginnings:');
+            disp(['          A Mean Deviation of ' num2str(mean(beginningDeviations)) ' frames']);
+            disp(['          A Mean Absolute Deviation of ' num2str(mean(abs(beginningDeviations))) ' frames']);
+            disp('     For the gesture endings:');
+            disp(['          A Mean Deviation of ' num2str(mean(endingDeviations)) ' frames']);
+            disp(['          A Mean Absolute Deviation of ' num2str(mean(abs(endingDeviations))) ' frames']);
             disp(' ');
             plotTestResult(errorMap, backtrackingMap, realGesturePositions);
             

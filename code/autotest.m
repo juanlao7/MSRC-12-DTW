@@ -1,7 +1,7 @@
 function result = autotest(config)
-    resultsF1 = table(0, 0, 0, 0);
-    resultsF1.Properties.VariableNames = {'GestureType', 'Precision', 'Recall', 'FScore'};
-    resultsF1(1, :) = [];      % Deleting the dummy row
+    results = table(0, 0, 0, 0, 0, 0, 0, 0);
+    results.Properties.VariableNames = {'GestureType', 'Precision', 'Recall', 'FScore', 'BeginningMD', 'BeginningMAD', 'EndingMD', 'EndingMAD'};
+    results(1, :) = [];      % Deleting the dummy row
 
     [trainingFiles, testingFiles] = getFiles(config.trainingParts, config.testingParts);
     
@@ -30,6 +30,9 @@ function result = autotest(config)
         falsePositives = 0;
         falseNegatives = 0;
         
+        beginningDeviations = [];
+        endingDeviations = [];
+        
         for testFile = testingFiles'
             disp(['    File ' testFile{1}]);
             [X, Y, ~] = load_file(testFile{1});
@@ -41,7 +44,11 @@ function result = autotest(config)
             
             [X, Y] = sanitizeFile(X, Y);
             
-            [realGestures, detectedGestures, ~, ~, ~] = test(model, X, Y, true, config.mode);
+            [realGestures, detectedGestures, ~, backtrackingMap, realGesturePositions] = test(model, X, Y, true, config.mode);
+            [currentBeginningDeviations, currentEndingDeviations] = getDeviations(backtrackingMap, realGesturePositions);
+            beginningDeviations = [beginningDeviations currentBeginningDeviations];
+            endingDeviations = [endingDeviations currentEndingDeviations];
+            
             disp(['        ' num2str(realGestures) ' real gestures']);
             disp(['        ' num2str(detectedGestures) ' detected gestures']);
             
@@ -52,21 +59,31 @@ function result = autotest(config)
         
         disp('Testing finished.');
         
-        disp(['    True positives: ' num2str(truePositives)]);
-        disp(['    False positives: ' num2str(falsePositives)]);
-        disp(['    False negatives: ' num2str(falseNegatives)]);
-        
         toc
         
         precision = truePositives / (truePositives + falsePositives);
         recall = truePositives / (truePositives + falseNegatives);
         fscore = 2 * precision * recall / (precision + recall);
         
+        beginningMD = mean(beginningDeviations);
+        beginningMAD = mean(abs(beginningDeviations));
+        endingMD = mean(endingDeviations);
+        endingMAD = mean(abs(endingDeviations));
+        
+        disp(['True positives: ' num2str(truePositives)]);
+        disp(['False positives: ' num2str(falsePositives)]);
+        disp(['False negatives: ' num2str(falseNegatives)]);
+        
         disp(['Precision: ' num2str(precision)]);
         disp(['Recall: ' num2str(recall)]);
         disp(['F-Score: ' num2str(fscore)]);
         
-        resultsF1(end + 1, :) = {gesture, precision, recall, fscore};
+        disp(['Beginning MD: ' num2str(beginningMD)]);
+        disp(['Beginning MAD: ' num2str(beginningMAD)]);
+        disp(['Ending MD: ' num2str(endingMD)]);
+        disp(['Ending MAD: ' num2str(endingMAD)]);
+        
+        results(end + 1, :) = {gesture, precision, recall, fscore, beginningMD, beginningMAD, endingMD, endingMAD};
     end
 end
 
