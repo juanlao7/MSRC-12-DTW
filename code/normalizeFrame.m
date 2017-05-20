@@ -6,8 +6,7 @@ function normalizedFrame = normalizeFrame(frame)
     normalizedFrame(4:4:80) = 0;
     
     % Scaling the skeleton forcing the distance between joint 1 and 2 to be
-    % a constant number (0.005, to be able to animate it in a small
-    % window).
+    % a constant number (0.005, to be able to animate it in a small window).
     
     jointAIndex = getJointIndex(1);
     jointBIndex = getJointIndex(2);

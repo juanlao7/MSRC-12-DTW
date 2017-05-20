@@ -4,6 +4,7 @@ function [model, trainingSet] = train(gesture, samples, modelIndex)
     samples(modelIndex, :) = [];        % Deleting the model from the samples.
     
     % Calculating the weights for the cost function.
+    %weights = ones(1, 80);
     weights = calculateWeights(modelSequence);
     
     % Comparing the model with all the samples.

@@ -33,17 +33,17 @@ function [realGestures, detectedGestures, errorMap, backtrackingMap, realGesture
             chosenI = i;
             chosenJ = j - 1;
             
-            if errorMap(i - 1, j) <= errorMap(chosenI, chosenJ)
+            if chosenJ < 1 || errorMap(i - 1, j) <= errorMap(chosenI, chosenJ)
                 chosenI = i - 1;
                 chosenJ = j;
             end
             
-            if errorMap(i - 1, j - 1) <= errorMap(chosenI, chosenJ)
+            if j > 1 && errorMap(i - 1, j - 1) <= errorMap(chosenI, chosenJ)
                 chosenI = i - 1;
                 chosenJ = j - 1;
             end
             
-            if chosenJ == candidate && n - i >= model.lastInsertionThreshold    % COMPROBAR ESTA CONDICION
+            if chosenJ == candidate && insertions > model.lastInsertionThreshold
                 break;
             end
             

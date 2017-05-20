@@ -6,7 +6,10 @@ function weights = calculateWeights(sequence)
         d = d + compareFrames(sequence(i - 1, :), sequence(i, :), unitaryWeights);
     end
     
-    %weights = ones(1, 80) - d / max(d);
-    weights = d / max(d);
+    % Logarthmic weighting. When we tried linear, we got worse F-Score.
+    %d = log(d + 1);
+    
+    weights = ones(1, 80) - d / max(d);
+    %weights = d / max(d);
 end
 

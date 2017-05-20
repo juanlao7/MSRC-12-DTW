@@ -1,4 +1,4 @@
-function result = autotest(config)
+function results = autotest(config)
     results = table(0, 0, 0, 0, 0, 0, 0, 0);
     results.Properties.VariableNames = {'GestureType', 'Precision', 'Recall', 'FScore', 'BeginningMD', 'BeginningMAD', 'EndingMD', 'EndingMAD'};
     results(1, :) = [];      % Deleting the dummy row
@@ -7,10 +7,8 @@ function result = autotest(config)
     
     if strcmp(config.mode, 'online')
         config.mode = 'first';
-    elseif strcmp(config.mode, 'offline')
-        config.mode = 'last';
     else
-        config.mode = 'all';
+        config.mode = 'last';
     end
 
     for gesture = 1:12
@@ -29,7 +27,6 @@ function result = autotest(config)
         truePositives = 0;
         falsePositives = 0;
         falseNegatives = 0;
-        
         beginningDeviations = [];
         endingDeviations = [];
         
